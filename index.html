@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>求职雷达 · 岗位匹配台</title>
+<style>
+  :root{
+    --paper:#F6F4EF;
+    --paper-2:#EFEBE3;
+    --card:#FFFFFF;
+    --ink:#161A1D;
+    --ink-2:#3A3F42;
+    --muted:#71736E;
+    --line:#E3DED3;
+    --line-2:#D6D0C2;
+    --accent:#C2452C;
+    --accent-soft:#F7E4DE;
+    --jade:#1D6B58;
+    --jade-soft:#E1EEE9;
+    --amber:#A97418;
+    --amber-soft:#F6EAD1;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(22,26,29,.04), 0 12px 28px -18px rgba(22,26,29,.22);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(circle at 1px 1px, rgba(22,26,29,.045) 1px, transparent 0);
+    background-size:22px 22px;
+    mask-image:linear-gradient(to bottom, #000 0%, transparent 55%);
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+  /* ---------- hero ---------- */
+  header.hero{padding:34px 0 26px;border-bottom:1px solid var(--line)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.22em;font-weight:700;color:var(--ink)}
+  .brand .pulse{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);animation:pulse 2.6s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px var(--accent-soft)}50%{box-shadow:0 0 0 7px rgba(194,69,44,.08)}}
+  .brand span.sep{color:var(--line-2)}
+  .brand em{font-style:normal;color:var(--muted);letter-spacing:.14em;font-weight:500}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-2);background:#fff;color:var(--ink);
+    padding:10px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;
+    transition:transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s;
+    font-family:inherit;
+  }
+  .btn:hover{border-color:var(--ink);transform:translateY(-1px);box-shadow:0 6px 18px -10px rgba(22,26,29,.4)}
+  .btn:active{transform:translateY(0)}
+  .btn-primary{background:var(--ink);color:#fff;border-color:var(--ink);padding:11px 20px}
+  .btn-primary:hover{background:#000}
+  .btn-primary .ico{display:inline-block;transition:transform .5s ease}
+  .btn-primary.loading .ico{animation:spin .9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .btn-ghost{background:transparent;border-color:transparent;color:var(--muted);padding:6px 10px}
+  .btn-ghost:hover{color:var(--ink);background:#fff;box-shadow:none}
+
+  h1{
+    font-family:"Songti SC","Noto Serif CJK SC","Source Han Serif SC",Georgia,serif;
+    font-size:clamp(25px,7.1vw,54px);line-height:1.18;letter-spacing:-.01em;margin:26px 0 0;font-weight:700;
+    max-width:15em;
+  }
+  h1 .thin{color:var(--muted);font-weight:400;font-style:italic}
+  h1 mark{background:linear-gradient(transparent 62%, var(--accent-soft) 62%);color:inherit;padding:0 .08em}
+  .lede{color:var(--ink-2);font-size:15px;max-width:52em;margin:16px 0 0}
+  .lede b{font-weight:600}
+
+  .mbr{display:none}
+  .profile{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .chip{
+    font-size:12.5px;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);
+    color:var(--ink-2);white-space:nowrap;
+  }
+  .chip.k{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip.warn{background:var(--amber-soft);border-color:#EBD9B4;color:#7A5310}
+
+  .stats{display:flex;gap:44px;flex-wrap:wrap;margin-top:30px;padding-top:22px;border-top:1px dashed var(--line-2)}
+  .stat b{display:block;font-size:30px;line-height:1.1;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat b.hot{color:var(--accent)}
+  .stat span{font-size:12px;color:var(--muted);letter-spacing:.04em}
+  .stat.small b{font-size:15px;font-weight:600;padding-top:9px}
+
+  /* ---------- controls ---------- */
+  .controls{position:sticky;top:0;z-index:20;background:rgba(246,244,239,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .controls-inner{display:flex;flex-direction:column;gap:10px;padding:12px 0}
+  .filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  @media(max-width:700px){.filter-row{justify-content:flex-start}}
+  @media(min-width:821px){.spacer{display:none}}
+  .tabs{display:flex;gap:4px;background:var(--paper-2);padding:4px;border-radius:999px;overflow-x:auto;scrollbar-width:none;align-self:flex-start;max-width:100%}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{
+    border:0;background:transparent;color:var(--ink-2);font-family:inherit;font-size:13px;font-weight:600;
+    padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:.15s;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(22,26,29,.12)}
+  .tab .n{font-size:11px;color:var(--muted);margin-left:5px;font-variant-numeric:tabular-nums}
+  .spacer{flex:1}
+  .field{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px}
+  .field input{border:0;outline:0;background:transparent;font-family:inherit;font-size:13px;width:150px;color:var(--ink)}
+  .field input::placeholder{color:#A6A69E}
+  .field svg{opacity:.5;flex:none}
+  select{font-family:inherit;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;color:var(--ink-2);cursor:pointer;outline:0}
+  select:focus{border-color:var(--ink)}
+
+  /* ---------- notice ---------- */
+  .notice{
+    margin:20px 0 0;display:flex;gap:12px;align-items:flex-start;
+    background:linear-gradient(180deg,#FFFDF8,#FBF7EC);border:1px solid #EADFC5;border-radius:14px;padding:14px 16px;
+    font-size:13px;color:#5C4A26;line-height:1.65;
+  }
+  .notice .badge{flex:none;font-size:11px;font-weight:700;letter-spacing:.08em;background:var(--amber);color:#fff;border-radius:5px;padding:2px 6px;margin-top:2px}
+  .notice b{color:#3E3013}
+
+  /* ---------- list ---------- */
+  main{padding:26px 0 10px}
+  .listhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .listhead h2{font-size:14px;letter-spacing:.14em;color:var(--muted);font-weight:600;margin:0;text-transform:uppercase}
+  .count{font-size:12.5px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  @media (max-width:820px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 16px;
+    display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow);transition:transform .2s ease, box-shadow .2s ease, border-color .2s;
+  }
+  .card:hover{transform:translateY(-2px);border-color:var(--line-2);box-shadow:0 2px 4px rgba(22,26,29,.05),0 22px 40px -26px rgba(22,26,29,.45)}
+  .card.dim{opacity:.62;filter:saturate(.5)}
+  .card.dim:hover{opacity:.85}
+  .card.urgent::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+
+  .chead{display:flex;gap:12px;align-items:flex-start}
+  .logo{
+    flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+    background:var(--paper-2);color:var(--ink);font-size:12.5px;font-weight:700;letter-spacing:.02em;
+    border:1px solid var(--line);overflow:hidden;text-align:center;line-height:1.05;padding:2px;
+  }
+  .card.urgent .logo{background:var(--accent-soft);border-color:#EFCFC6;color:#8A2E1B}
+  .titles{flex:1;min-width:0}
+  .titles h3{font-size:15.5px;line-height:1.42;margin:0 0 3px;font-weight:650;letter-spacing:-.01em}
+  .titles .co{font-size:12.5px;color:var(--muted)}
+  .titles .co b{color:var(--ink-2);font-weight:600}
+
+  .score{flex:none;text-align:right;line-height:1}
+  .score .num{font-size:24px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--jade)}
+  .score .num.mid{color:var(--amber)}
+  .score .num.low{color:var(--muted)}
+  .score small{display:block;font-size:10px;letter-spacing:.14em;color:var(--muted);margin-top:3px}
+
+  .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .pill{font-size:11.5px;padding:3px 9px;border-radius:6px;background:var(--paper-2);color:var(--ink-2);white-space:nowrap}
+  .pill.dead{background:var(--accent);color:#fff;font-weight:600}
+  .pill.soon{background:var(--accent-soft);color:#96331C;font-weight:600}
+  .pill.long{background:var(--jade-soft);color:var(--jade);font-weight:600}
+  .pill.fit-ok{background:var(--jade-soft);color:#14523F;font-weight:600}
+  .pill.fit-check{background:var(--amber-soft);color:#7A5310;font-weight:600}
+  .pill.fit-no{background:#EDEAE3;color:#8A8880;font-weight:600}
+
+  .jd{margin:0;font-size:13px;color:var(--ink-2);line-height:1.68}
+  .reasons{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .reasons li{position:relative;padding-left:16px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+  .reasons li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:2px;background:var(--jade);opacity:.65}
+  .card.urgent .reasons li::before{background:var(--accent)}
+
+  .tags{display:flex;flex-wrap:wrap;gap:5px}
+  .tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+
+  .cfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:12px;border-top:1px dashed var(--line)}
+  .src{font-size:11px;color:#9A9A92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .acts{display:flex;align-items:center;gap:6px;flex:none}
+  .icon-btn{
+    border:1px solid var(--line);background:#fff;border-radius:8px;width:32px;height:32px;display:grid;place-items:center;
+    cursor:pointer;color:var(--muted);transition:.15s;padding:0;
+  }
+  .icon-btn:hover{border-color:var(--ink);color:var(--ink)}
+  .icon-btn[data-on="1"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .icon-btn[data-on="1"].ok{background:var(--jade);border-color:var(--jade);color:#fff}
+  .apply{
+    display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--ink);color:#fff;
+    font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:9px;transition:.16s;white-space:nowrap;
+  }
+  .apply:hover{background:var(--accent);transform:translateY(-1px)}
+  .apply.off{background:#EDEAE3;color:#8A8880;pointer-events:none}
+
+  .empty{text-align:center;padding:70px 20px;color:var(--muted);border:1px dashed var(--line-2);border-radius:var(--radius);background:rgba(255,255,255,.5)}
+  .empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+
+  /* ---------- sources ---------- */
+  .panel{margin:38px 0 0;border-top:1px solid var(--line);padding-top:26px}
+  .panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .panel h2{font-family:"Songti SC","Noto Serif CJK SC",Georgia,serif;font-size:22px;margin:0;letter-spacing:-.01em}
+  .panel p.sub{font-size:12.5px;color:var(--muted);margin:0}
+  .srcgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  @media(max-width:900px){.srcgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .srclink{
+    display:block;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;
+    transition:.16s;position:relative;
+  }
+  .srclink:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .srclink .g{font-size:10.5px;color:#9A9A92;letter-spacing:.1em;display:block;margin-bottom:4px}
+  .srclink .nm{font-size:13.5px;font-weight:650;color:var(--ink);display:block}
+  .srclink .nt{font-size:11.5px;color:var(--muted);display:block;margin-top:2px}
+  .srclink::after{content:"↗";position:absolute;right:12px;top:11px;color:var(--line-2);font-size:13px;transition:.16s}
+  .srclink:hover::after{color:var(--accent);transform:translate(1px,-1px)}
+
+  footer{margin:44px 0 0;padding:22px 0 40px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:11.5px;color:#9A9A92;line-height:1.7}
+
+  .toast{
+    position:fixed;left:50%;bottom:30px;transform:translate(-50%,20px);background:var(--ink);color:#fff;
+    padding:11px 20px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:100;
+    box-shadow:0 12px 30px -12px rgba(0,0,0,.6);max-width:90vw;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.err{background:var(--accent)}
+
+
+  @media(max-width:640px){
+    .wrap{padding:0 18px}
+    .mbr{display:inline}
+    header.hero{padding:24px 0 20px}
+    h1{margin-top:20px}
+    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px}
+    .stat b{font-size:26px}
+    .stat.small{grid-column:1/-1;border-top:1px dashed var(--line-2);padding-top:12px}
+    .card{padding:16px 15px 14px}
+    .cfoot{flex-wrap:wrap}
+    .src{width:100%}
+  }
+
+  @media print{
+    .controls,.hero-actions,.acts,.srclink::after{display:none}
+    body{background:#fff}
+    .card{break-inside:avoid;box-shadow:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <span class="pulse"></span>
+        <span>JOB RADAR</span>
+        <span class="sep">/</span>
+        <em>个人岗位匹配台</em>
+      </div>
+      <div class="hero-actions">
+        <button class="btn" id="printBtn" title="打印或存为 PDF">导出 / 打印</button>
+        <button class="btn btn-primary" id="updateBtn"><span class="ico">⟳</span><span id="updateLabel">更新岗位</span></button>
+      </div>
+    </div>
+
+    <h1>把「合适」和<span class="mbr"><br></span>「<mark>还在有效期</mark>」<br><span class="thin">筛到同一屏。</span></h1>
+    <p class="lede">
+      基于 <b>UCD 人机交互硕士（2026.02 毕业）</b> 的简历结构，从 BOSS 直聘、国聘、国资央企招聘平台、国家大学生就业服务平台
+      与你资料库中收藏的招聘站点汇总岗位；点击「更新岗位」会重新校验 <b>投递有效期</b>，只留下仍可投递的匹配结果，每条都带直达投递链接。
+    </p>
+
+    <div class="profile">
+      <span class="chip k">智能座舱 · HMI 交互设计</span>
+      <span class="chip k">技术美术 TA · 3D 交互</span>
+      <span class="chip">上海 / 深圳 / 广州 / 北京 / 杭州</span>
+      <span class="chip">Unity · C# · WebGL · 实时渲染</span>
+      <span class="chip">用户研究 · 人因 · 触觉 / 无障碍</span>
+      <span class="chip warn">2026.02 毕业 · 择业期内</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="statActive">–</b><span>在招岗位</span></div>
+      <div class="stat"><b id="statUrgent" class="hot">–</b><span>7 天内截止</span></div>
+      <div class="stat"><b id="statEligible">–</b><span>26 届可直接投</span></div>
+      <div class="stat"><b id="statExpired">–</b><span>已截止 / 已隐藏</span></div>
+      <div class="stat small"><b id="statTime">–</b><span>数据版本时间</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap controls-inner">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="all" aria-selected="true">全部推荐<span class="n" id="n-all"></span></button>
+      <button class="tab" role="tab" data-tab="hmi" aria-selected="false">智能座舱 · HMI<span class="n" id="n-hmi"></span></button>
+      <button class="tab" role="tab" data-tab="ta" aria-selected="false">游戏 · 技术美术<span class="n" id="n-ta"></span></button>
+      <button class="tab" role="tab" data-tab="research" aria-selected="false">用户研究<span class="n" id="n-research"></span></button>
+      <button class="tab" role="tab" data-tab="soe" aria-selected="false">央国企<span class="n" id="n-soe"></span></button>
+      <button class="tab" role="tab" data-tab="mine" aria-selected="false">收藏 / 已投<span class="n" id="n-mine"></span></button>
+      <button class="tab" role="tab" data-tab="expired" aria-selected="false">已截止<span class="n" id="n-expired"></span></button>
+    </div>
+    <div class="filter-row">
+      <label class="field">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="公司 / 岗位 / 关键词" autocomplete="off">
+      </label>
+      <select id="city"><option value="">全部城市</option></select>
+      <select id="sort">
+        <option value="match">按匹配度</option>
+        <option value="deadline">按截止临近</option>
+        <option value="recent">按新增顺序</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="notice" id="notice">
+    <span class="badge">说明</span>
+    <div>
+      <b>关于你 2026.02 毕业这件事：</b>11 月的补录名额多写「2027 届」，26 届基本报不上。你的两条主线是 ——
+      ① 明确写<b>「26 届可投 / 择业期（毕业 2 年内）可报」</b>的校招（如一汽）；
+      ② 写<b>「0–3 年经验」的社招</b>（如快手、懒兔），把 3 年实验室项目经验折算成等效经历。
+      其余标<b>「届别需确认」</b>的岗位，建议「先投递 + 找内推 + 争取实习转正」，不少央企对择业期同样认可。已截止岗位自动隐藏，可在「已截止」页查看。
+    </div>
+  </div>
+
+  <main>
+    <div class="listhead">
+      <h2 id="listTitle">在招推荐</h2>
+      <div class="count" id="listCount"></div>
+    </div>
+    <div class="grid" id="list"></div>
+  </main>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>数据源直达</h2>
+        <p class="sub">来自你资料库「找工作」收藏的站点 + 本次检索使用的平台，点开即为实时搜索结果。</p>
+      </div>
+      <button class="btn btn-ghost" id="copySources">复制全部链接</button>
+    </div>
+    <div class="srcgrid" id="sources"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>央国企报名入口</h2>
+        <p class="sub">来自你资料库中的《报名网址（央国企 + 公务员 + 事业单位 + 军队文职）》清单，按「设计 / 交互 / 车辆」相关度筛出。</p>
+      </div>
+    </div>
+    <div class="srcgrid" id="soeLinks"></div>
+  </section>
+
+  <footer>
+    <div>
+      数据版本 <span id="footVer">–</span> · 生成于 <span id="footAt">–</span><br>
+      岗位信息来自公开校招公告与招聘平台，投递前请以企业官网最新公告为准。
+    </div>
+    <div style="text-align:right">
+      匹配度 = 方向对口度 × 经历可迁移性 × 城市 / 届别可行性<br>
+      收藏与投递记录仅保存在本机浏览器
+    </div>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = {
+  "version": "v1.3",
+  "generatedAt": "2026-11-09T07:25:00+08:00",
+  "candidate": {
+    "name": "UCD HCI 硕士 · 2026 届",
+    "graduation": "2026-02",
+    "targets": [
+      "智能座舱交互体验设计 / HMI 设计",
+      "技术美术 TA · 3D 交互与动画"
+    ],
+    "cities": [
+      "上海",
+      "深圳",
+      "广州",
+      "北京",
+      "杭州"
+    ]
+  },
+  "platforms": [
+    {
+      "name": "BOSS 直聘",
+      "url": "https://www.zhipin.com/web/geek/job?query=%E6%99%BA%E8%83%BD%E5%BA%A7%E8%88%B1%20HMI&city=101020100",
+      "note": "上海 · 关键词已预设",
+      "group": "综合招聘"
+    },
+    {
+      "name": "国聘",
+      "url": "https://www.iguopin.com/",
+      "note": "央企 / 国企主渠道",
+      "group": "央国企"
+    },
+    {
+      "name": "国资央企招聘平台",
+      "url": "https://cujiuye.iguopin.com/",
+      "note": "国资委促就业专场",
+      "group": "央国企"
+    },
+    {
+      "name": "国家大学生就业服务平台",
+      "url": "https://www.ncss.cn/student/jobs/index.html",
+      "note": "24365 · 校园招聘",
+      "group": "校园招聘"
+    },
+    {
+      "name": "公招网",
+      "url": "https://www.gongzhao.com.cn/",
+      "note": "公务员 / 事业单位",
+      "group": "体制内"
+    },
+    {
+      "name": "中国国家人才网",
+      "url": "https://www.newjobs.com.cn/",
+      "note": "人社部主办",
+      "group": "综合招聘"
+    },
+    {
+      "name": "中国留学网 · 留学人才",
+      "url": "https://lxycmob.cscse.edu.cn/",
+      "note": "海归专属通道",
+      "group": "海归"
+    },
+    {
+      "name": "LinkedIn 中国",
+      "url": "https://www.linkedin.cn/",
+      "note": "外企 / 跨国团队",
+      "group": "外企"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "faw-2027",
+      "company": "中国一汽",
+      "short": "一汽",
+      "title": "2027 届全球校园招聘 · 设计类（HMI / UI / UE 设计）",
+      "track": "hmi",
+      "city": [
+        "长春",
+        "北京",
+        "上海",
+        "南京",
+        "青岛",
+        "成都",
+        "佛山"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2026 / 2027 届均可投",
+      "fit": "eligible",
+      "match": 95,
+      "deadline": "",
+      "deadlineText": "未设截止 · 招满即止",
+      "reasons": [
+        "HMI / UI / UE 设计方向与求职意向完全对口",
+        "明确写明 26 届可投，你的毕业时间正好在范围内",
+        "设计类岗位重视作品集与跨学科背景，UCD 硕士 + 数字媒体本科有优势"
+      ],
+      "tags": [
+        "央企",
+        "26 届可投",
+        "设计类"
+      ],
+      "jd": "红旗 / 解放 / 奔腾品牌整车造型与智能座舱交互设计；覆盖智能网联研发、整车研发、设计、数智化等 8 大类岗位。英语 CET-4 为硬性要求（你已达标）。",
+      "apply": "http://zhaopin.faw.com.cn",
+      "applyLabel": "一汽招聘官网",
+      "source": "中国一汽招聘官网"
+    },
+    {
+      "id": "adayo-2027",
+      "company": "华阳集团 ADIECO",
+      "short": "华阳",
+      "title": "HMI 交互设计（2027 届校招 · 技术研发类）",
+      "track": "hmi",
+      "city": [
+        "惠州",
+        "广州",
+        "深圳",
+        "上海",
+        "南京",
+        "西安",
+        "北京"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届本科及以上",
+      "fit": "check",
+      "match": 92,
+      "deadline": "2026-12-31",
+      "deadlineText": "2026-12-31 截止",
+      "reasons": [
+        "HMI 交互设计岗，与座舱体验方向一致",
+        "客户含比亚迪、小米、理想、小鹏，座舱 HMI 项目密度高",
+        "上海 / 深圳 / 广州均有名额，覆盖你的期望城市"
+      ],
+      "tags": [
+        "Tier1",
+        "多城市",
+        "座舱 HMI"
+      ],
+      "jd": "智能座舱 + 精密压铸 + 新能源部件三大板块；技术研发类含 HMI 交互设计、光学设计（HUD）、智能座舱软件开发。部分技术岗接受实习转正。",
+      "apply": "https://www.chaojijianli.com/xiaozhao/adayo-huayang-2027-campus-recruitment-16224-a94bcc/",
+      "applyLabel": "岗位公告",
+      "source": "华阳集团校招公告"
+    },
+    {
+      "id": "saic-2027",
+      "company": "上汽大乘用车",
+      "short": "上汽",
+      "title": "27 届秋招 · 智能座舱与软件开发 / 用户调研",
+      "track": "hmi",
+      "city": [
+        "上海",
+        "郑州",
+        "南京",
+        "宁德"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届本科及以上",
+      "fit": "check",
+      "match": 90,
+      "deadline": "",
+      "deadlineText": "2026-09-02 起 · 未设截止",
+      "reasons": [
+        "同时开放「智能座舱与软件开发」与「用户调研 / 产品定义」，可双线投递",
+        "上海为主战场，通勤与生活成本可控",
+        "工业设计 / 艺术类专业被明确列入专业要求"
+      ],
+      "tags": [
+        "整车厂",
+        "上海",
+        "用户研究"
+      ],
+      "jd": "整车集成与架构、造型设计与内外饰、智能网联与智能驾驶、智能座舱与软件开发、产品规划与用户研究等方向；专业含工业设计与艺术类。",
+      "apply": "https://miaoruzhi.com/recruitment/f0149da3-ff54-4849-82b4-8bffb8ec5e9d",
+      "applyLabel": "岗位公告",
+      "source": "上汽大乘用车校招"
+    },
+    {
+      "id": "neuehct-2027",
+      "company": "neueHCT（欧摩威 × 地平线）",
+      "short": "nH",
+      "title": "2027 届校招 · HMI 方向（合资智驾 Tier1）",
+      "track": "hmi",
+      "city": [
+        "北京",
+        "上海",
+        "南京"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届",
+      "fit": "check",
+      "match": 88,
+      "deadline": "",
+      "deadlineText": "招满即止",
+      "reasons": [
+        "HMI 与多模态交互是明确开放的岗位方向",
+        "地平线生态 + 德系 Tier1 流程，技术栈贴近座舱 HMI",
+        "上海有岗，团队年轻、产品迭代快"
+      ],
+      "tags": [
+        "智驾 Tier1",
+        "HMI",
+        "内推可查"
+      ],
+      "jd": "原大陆集团汽车子集团与地平线合资，聚焦高级辅助驾驶与智能驾驶解决方案；开放软件、算法、测试、HMI、云平台等方向。",
+      "apply": "https://neuehct.jobs.feishu.cn/s/7j64az2WPGI",
+      "applyLabel": "飞书投递",
+      "source": "高校就业网公告"
+    },
+    {
+      "id": "thunder-2027",
+      "company": "中科创达 · 智能汽车",
+      "short": "中科",
+      "title": "HMI 开发工程师（Kanzi / C++，2027 届）",
+      "track": "hmi",
+      "city": [
+        "上海"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届本科及以上",
+      "fit": "check",
+      "match": 84,
+      "deadline": "",
+      "deadlineText": "长期在招",
+      "reasons": [
+        "要求 Unity3D / UE / OpenGL 经验，与你的 Unity + WebGL 背景直接对应",
+        "HMI 效果实现偏工程，你的「设计 + 代码」双背景正合适",
+        "明确欢迎计算机图形学背景"
+      ],
+      "tags": [
+        "Kanzi",
+        "工程向 HMI",
+        "上海"
+      ],
+      "jd": "使用 Kanzi 实现 HMI 效果，参与智能座舱与智驾逻辑搭建；要求 C/C++ 或 Android Java 基础，有 Unity3D / UE / OpenGL 经验者优先，CET-4 起。",
+      "apply": "https://www.thejobsmap.com/job/7c2036d9-7cbc-4563-a202-7e24d29645ed",
+      "applyLabel": "岗位详情",
+      "source": "中科创达校招"
+    },
+    {
+      "id": "xiaomi-2027",
+      "company": "小米集团",
+      "short": "小米",
+      "title": "2027 届全球校招 · 设计类（人车家全生态）",
+      "track": "hmi",
+      "city": [
+        "北京",
+        "上海",
+        "武汉",
+        "南京",
+        "西安",
+        "深圳"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2026.9–2027.8 毕业",
+      "fit": "check",
+      "match": 87,
+      "deadline": "2026-12-31",
+      "deadlineText": "2026-12-31 截止",
+      "reasons": [
+        "设计类单列，汽车座舱与手机 / IoT 多端体验一致性问题正是你的项目经验",
+        "上海、深圳均有岗；每人限投 2 个职位，需精选",
+        "AIGC 应用于素材生成的经验可作为差异化亮点"
+      ],
+      "tags": [
+        "人车家",
+        "设计类",
+        "限投 2 岗"
+      ],
+      "jd": "17+ 职类开放，含设计类、产品类、软件研发类；工作地覆盖北京、上海、武汉、南京、西安、深圳及海外。网申 2026-08-10 至 2026-12-31。",
+      "apply": "https://hr.xiaomi.com/campus",
+      "applyLabel": "小米校招官网",
+      "source": "小米集团校招"
+    },
+    {
+      "id": "xpeng-2027",
+      "company": "小鹏汽车",
+      "short": "小鹏",
+      "title": "【27 届校招】用户研究培训生",
+      "track": "research",
+      "city": [
+        "广州"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届硕士及以上",
+      "fit": "check",
+      "match": 86,
+      "deadline": "2026-12-31",
+      "deadlineText": "2026-12-31 截止",
+      "reasons": [
+        "硕士起投，UCD HCI 硕士学历达标",
+        "要求定性与定量结合，你有 Python / MySQL 数据管道与调研闭环经验",
+        "车型全生命周期研究，与「真实用车场景 → 交互方案」的思路一致"
+      ],
+      "tags": [
+        "用户研究",
+        "硕士",
+        "整车厂"
+      ],
+      "jd": "参与车型全生命周期调研（机会洞察到上市复盘），定性 + 定量识别业务难点，将用户需求转化为可量化的机会与风险。",
+      "apply": "https://www.zhipin.com/job_detail/9000a0e9aa50b9510nF83t-5EVtV.html",
+      "applyLabel": "BOSS 直聘",
+      "source": "BOSS 直聘"
+    },
+    {
+      "id": "gac-2027",
+      "company": "广汽集团",
+      "short": "广汽",
+      "title": "2027 届全球校招 · 设计类 / 智能网联类",
+      "track": "hmi",
+      "city": [
+        "广州",
+        "上海",
+        "北京",
+        "武汉",
+        "长沙",
+        "西安"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2026.9–2027.12 毕业",
+      "fit": "check",
+      "match": 82,
+      "deadline": "2026-11-09",
+      "deadlineText": "今日截止",
+      "reasons": [
+        "设计类 + 智能网联类双通道，广州大本营 + 上海有岗",
+        "明确「可提前实习者优先」，你 2026.02 已毕业，可即时到岗",
+        "本科 CET-4 / 研究生 CET-6 要求，你满足本科线"
+      ],
+      "tags": [
+        "整车厂",
+        "今日截止",
+        "可即时到岗"
+      ],
+      "jd": "覆盖大研发体系、昊铂埃安 BU、传祺 BU 等；岗位含产品研发、智能网联、设计、商品企划、营销等方向。",
+      "apply": "https://www.wondercv.com/xiaozhao/gac-group-2027-campus-recruitment-14769-fd7f7c",
+      "applyLabel": "岗位公告",
+      "source": "广汽集团校招"
+    },
+    {
+      "id": "byd-2027",
+      "company": "比亚迪",
+      "short": "BYD",
+      "title": "2027 届秋招 · 设计学类 / 美术学类",
+      "track": "hmi",
+      "city": [
+        "深圳",
+        "西安",
+        "长沙",
+        "常州"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届本硕博",
+      "fit": "check",
+      "match": 78,
+      "deadline": "2027-07-01",
+      "deadlineText": "2027-07-01 截止",
+      "reasons": [
+        "设计学类被列入招聘专业，岗位基数大、容错率高",
+        "深圳总部，符合期望城市",
+        "智能座舱与 DiLink 生态持续扩张，HMI 需求稳定"
+      ],
+      "tags": [
+        "整车厂",
+        "岗位基数大",
+        "深圳"
+      ],
+      "jd": "2027 届全球校招，覆盖机械、电子信息、设计学、美术学等专业；PC 端 job.byd.com 选择「校园招聘」投递，移动端关注「比亚迪招聘」。",
+      "apply": "https://job.byd.com",
+      "applyLabel": "比亚迪招聘",
+      "source": "比亚迪招聘官网"
+    },
+    {
+      "id": "lixiang-2027",
+      "company": "理想汽车",
+      "short": "理想",
+      "title": "2027 届校招 · 设计类",
+      "track": "hmi",
+      "city": [
+        "北京",
+        "上海",
+        "深圳",
+        "杭州",
+        "常州"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届（2026.9–2027.8 毕业）",
+      "fit": "check",
+      "match": 80,
+      "deadline": "",
+      "deadlineText": "招满即止",
+      "reasons": [
+        "设计类单列，座舱与整车体验团队规模大",
+        "北京 / 上海双研发中心，岗位选择多",
+        "重视「超越用户需求」的产品思维，与你的用户研究闭环契合"
+      ],
+      "tags": [
+        "整车厂",
+        "设计类",
+        "双研发中心"
+      ],
+      "jd": "职位类别含整车与智能硬件研发、算法与软件、产品、设计、项目管理等；工作地北京、上海、深圳、杭州、常州。",
+      "apply": "https://www.lixiang.com/employ/campus/list.html",
+      "applyLabel": "理想校招官网",
+      "source": "理想汽车校招"
+    },
+    {
+      "id": "netease-2027",
+      "company": "网易游戏互娱",
+      "short": "网易",
+      "title": "2027 届秋招 · 技术美术（TA）",
+      "track": "ta",
+      "city": [
+        "杭州",
+        "上海",
+        "北京",
+        "广州",
+        "深圳",
+        "成都",
+        "武汉"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届",
+      "fit": "check",
+      "match": 93,
+      "deadline": "2026-12-20",
+      "deadlineText": "2026-12-20 截止",
+      "reasons": [
+        "TA 岗要求「美术感知力 + 程序能力」，正是你的美术管线 + Unity/C# 双背景",
+        "Shader / 渲染管线要求，你有 WebGL、实时渲染与图形学课程基础",
+        "美术、策划岗明确建议附作品集，你的 VR/AR 项目可直接成片"
+      ],
+      "tags": [
+        "头部大厂",
+        "TA",
+        "作品集优先"
+      ],
+      "jd": "技术研发、美术设计、产品策划等方向；TA 需熟悉 HLSL/GLSL Shader 编写，有 Unity / Unreal 管线优化经验者优先。",
+      "apply": "https://campus.game.163.com/app/job/position?id=102",
+      "applyLabel": "网易校招官网",
+      "source": "网易游戏互娱校招"
+    },
+    {
+      "id": "mihoyo-2027",
+      "company": "米哈游",
+      "short": "米",
+      "title": "2027 校招 · 技术美术 TA（部分岗位延长投递）",
+      "track": "ta",
+      "city": [
+        "上海",
+        "北京",
+        "深圳",
+        "杭州",
+        "成都"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届（2026.9–2027.8 毕业）",
+      "fit": "check",
+      "match": 91,
+      "deadline": "2026-11-15",
+      "deadlineText": "2026-11-15 截止（延长批次）",
+      "reasons": [
+        "TA 与 3D 美术均在延长投递名单内，仍有窗口",
+        "游戏引擎开发 + TA 方向，你的实时渲染与三维建模组合稀缺",
+        "上海为主，作品集评估环节可充分发挥"
+      ],
+      "tags": [
+        "二次元头部",
+        "TA",
+        "6 天后截止"
+      ],
+      "jd": "研发类含客户端、服务端、引擎开发、TA、测试；美术类含角色 / 场景原画、3D 模型、动画、特效、UI。部分岗位网申延长至 2026-11-15。",
+      "apply": "https://hr.mihoyo.com",
+      "applyLabel": "米哈游招聘",
+      "source": "米哈游招聘公众号"
+    },
+    {
+      "id": "hypergryph-2027",
+      "company": "鹰角网络",
+      "short": "鹰角",
+      "title": "2027 校招 · 技术美术-动画方向",
+      "track": "ta",
+      "city": [
+        "上海"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届",
+      "fit": "check",
+      "match": 90,
+      "deadline": "2026-11-30",
+      "deadlineText": "2026-11-30 截止",
+      "reasons": [
+        "岗位要求动画系统 + 基础代码能力（C++/C#/Python），三条你都沾",
+        "你有虚拟角色动作捕捉与骨骼驱动经验，直接对应 3C 动画逻辑",
+        "上海，投递可 2 次，容错空间大"
+      ],
+      "tags": [
+        "二次元",
+        "动捕经验对口",
+        "上海"
+      ],
+      "jd": "协助搭建维护游戏内动画系统，参与角色 / 怪物 3C 动画逻辑实现；熟悉至少一个引擎动画系统与一个 DCC 工具，掌握 C++/C#/Python 优先。",
+      "apply": "https://app.mokahr.com/campus-recruitment/hypergryph/26326#/job/761e7e73-c9c9-41f3-84c4-7c3cafed5bf3",
+      "applyLabel": "Moka 投递",
+      "source": "鹰角网络校招"
+    },
+    {
+      "id": "cec-2027",
+      "company": "中国电子 CEC",
+      "short": "CEC",
+      "title": "2027 届校招 · 交互体验设计师",
+      "track": "hmi",
+      "city": [
+        "北京",
+        "上海",
+        "南京",
+        "杭州",
+        "深圳",
+        "广州"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届海内外",
+      "fit": "check",
+      "match": 86,
+      "deadline": "",
+      "deadlineText": "长期 · 各成员单位分批",
+      "reasons": [
+        "「交互体验设计师」为明确列出的产品设计类岗位",
+        "中电云计算等成员单位在上海、深圳有岗",
+        "央企平台 + 网信主业，稳定性与技术纵深兼具"
+      ],
+      "tags": [
+        "央企",
+        "交互体验",
+        "多城市"
+      ],
+      "jd": "产品设计类含交互体验设计师；成员单位含飞腾、中电云计算、中电二公司等，工作地覆盖北京、上海、广州、深圳、南京、杭州、无锡等。",
+      "apply": "https://cecjob.iguopin.com/",
+      "applyLabel": "中国电子校招",
+      "source": "中国电子校招"
+    },
+    {
+      "id": "cetc14-2027",
+      "company": "中国电科 14 所",
+      "short": "14所",
+      "title": "27 届秋招 · 体验（人机交互）设计师",
+      "track": "hmi",
+      "city": [
+        "南京"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届",
+      "fit": "check",
+      "match": 83,
+      "deadline": "",
+      "deadlineText": "长期在招",
+      "reasons": [
+        "岗位名直接叫「体验（人机交互）设计师」，专业对口度极高",
+        "雷达显控界面属于高复杂度 HMI，人因工程价值大",
+        "南京生活成本低，央企编制与稳定性好"
+      ],
+      "tags": [
+        "军工央企",
+        "人机交互",
+        "南京"
+      ],
+      "jd": "27 届秋招开放体验（人机交互）设计师、工业设计工程师等岗位；需笔试，工作地南京。",
+      "apply": "https://miaoruzhi.com/recruitment/3c42cf36-3a49-41c1-9695-fab06f4f059f",
+      "applyLabel": "岗位公告",
+      "source": "中国电科 14 所校招"
+    },
+    {
+      "id": "cestc-2027",
+      "company": "中电云计算",
+      "short": "中电云",
+      "title": "视觉设计师 · 多媒体方向（2027 届硕士）",
+      "track": "hmi",
+      "city": [
+        "北京"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届硕士",
+      "fit": "check",
+      "match": 80,
+      "deadline": "",
+      "deadlineText": "长期在招",
+      "reasons": [
+        "硕士门槛，UCD HCI 硕士符合",
+        "要求 Figma / PS / AE 与动效能力，你有视觉传达与数字影像基础",
+        "输出设计规范、协同研发落地，与你「设计—原型—落地」的定位一致"
+      ],
+      "tags": [
+        "央企子公司",
+        "视觉 / 动效",
+        "北京"
+      ],
+      "jd": "负责多媒体产品 UI / 视觉设计、动效设计与素材创作，输出设计规范并协同研发落地；要求 2027 届硕士，掌握 Figma/PS/AE。",
+      "apply": "https://app.mokahr.com/campus-recruitment/cestc/102244#/jobs/",
+      "applyLabel": "Moka 投递",
+      "source": "央国企岗位库"
+    },
+    {
+      "id": "xinmu-2027",
+      "company": "新木网络",
+      "short": "新木",
+      "title": "【2027 校招】游戏美术 - TA（技术美术）",
+      "track": "ta",
+      "city": [
+        "上海"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届本科及以上",
+      "fit": "check",
+      "match": 88,
+      "deadline": "",
+      "deadlineText": "招满即止",
+      "reasons": [
+        "明确要「美术类或计算机相关专业」，你的双背景正中靶心",
+        "要求了解 DCC 工具与引擎材质，你有三维建模 + Unity 实操",
+        "薪资 12–20K·14 薪，中小团队成长速度快"
+      ],
+      "tags": [
+        "TA",
+        "上海徐汇",
+        "12–20K"
+      ],
+      "jd": "2027 届本科及以上，美术类或计算机相关专业；审美能力强、了解 DCC 工具与引擎材质，薪资 12–20K·14 薪。",
+      "apply": "https://www.zhipin.com/web/geek/job?query=%E6%8A%80%E6%9C%AF%E7%BE%8E%E6%9C%AF&city=101020100",
+      "applyLabel": "BOSS 直聘检索",
+      "source": "BOSS 直聘"
+    },
+    {
+      "id": "37-2027",
+      "company": "三七互娱",
+      "short": "37",
+      "title": "2027 届秋招 · GUI 设计师 / 美术设计类",
+      "track": "ta",
+      "city": [
+        "广州",
+        "上海"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届",
+      "fit": "check",
+      "match": 76,
+      "deadline": "2026-11-15",
+      "deadlineText": "2026-11-15 截止",
+      "reasons": [
+        "GUI 设计师方向与界面信息架构、视觉规范经验对应",
+        "公司布局 XR / 人机交互前沿方向，与你的 VR/AR 背景有交集",
+        "广州总部 + 上海团队，双城可选"
+      ],
+      "tags": [
+        "A 股上市",
+        "GUI",
+        "6 天后截止"
+      ],
+      "jd": "美术设计类含场景 / 角色原画、3D 特效、3D 动作、GUI 设计师、海外创意策划等；岗位招满随时关停。",
+      "apply": "https://app.mokahr.com/m/campus-recruitment/37/58016?locale=zh-CN",
+      "applyLabel": "Moka 投递",
+      "source": "三七互娱校招"
+    },
+    {
+      "id": "kuaishou-ta",
+      "company": "快手 · 游戏",
+      "short": "快手",
+      "title": "游戏技术美术（社招 · 1–3 年）",
+      "track": "ta",
+      "city": [
+        "上海"
+      ],
+      "batch": "社会招聘",
+      "audience": "1–3 年经验 / 优秀应届可谈",
+      "fit": "check",
+      "match": 74,
+      "deadline": "",
+      "deadlineText": "长期在招",
+      "reasons": [
+        "1–3 年门槛，实验室 3 年项目经验可作为等效经历包装",
+        "要求渲染基础与 DCC 工具（3ds Max / PS / SP / Blender），你具备三维建模与渲染基础",
+        "11–16K 区间，作为保底选项合理"
+      ],
+      "tags": [
+        "社招",
+        "1–3 年",
+        "上海徐汇"
+      ],
+      "jd": "渲染向技能要求：常规 DCC 软件（3ds Max、PS、SP、Blender）、PBR 渲染与特效渲染基础；1–3 年经验，学历不限。",
+      "apply": "https://www.zhipin.com/web/geek/job?query=%E6%B8%B8%E6%88%8F%E6%8A%80%E6%9C%AF%E7%BE%8E%E6%9C%AF&city=101020100",
+      "applyLabel": "BOSS 直聘检索",
+      "source": "BOSS 直聘"
+    },
+    {
+      "id": "lantu-ta",
+      "company": "上海懒兔网络",
+      "short": "懒兔",
+      "title": "技术美术（社招 · 1–3 年 · 硕士）",
+      "track": "ta",
+      "city": [
+        "上海"
+      ],
+      "batch": "社会招聘",
+      "audience": "1–3 年 / 硕士",
+      "fit": "check",
+      "match": 72,
+      "deadline": "",
+      "deadlineText": "长期在招",
+      "reasons": [
+        "硕士学历要求，你的 UCD 硕士符合硬门槛",
+        "粒子特效方向优先，你的实时渲染与动效经验可迁移",
+        "15–30K·14 薪，上限高于同级别校招"
+      ],
+      "tags": [
+        "社招",
+        "硕士",
+        "15–30K"
+      ],
+      "jd": "负责粒子系统资源管理与性能把控，对粒子效果做开销分析与内存优化；1–3 年经验，硕士。",
+      "apply": "https://www.zhipin.com/web/geek/job?query=%E6%8A%80%E6%9C%AF%E7%BE%8E%E6%9C%AF&city=101020100",
+      "applyLabel": "BOSS 直聘检索",
+      "source": "BOSS 直聘"
+    },
+    {
+      "id": "dian-2027",
+      "company": "点点互动 Century Games",
+      "short": "点点",
+      "title": "技术美术 - 上海（2027 届校招）",
+      "track": "ta",
+      "city": [
+        "上海",
+        "北京",
+        "深圳",
+        "广州"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届本科及以上",
+      "fit": "expired",
+      "match": 89,
+      "deadline": "2026-10-31",
+      "deadlineText": "已于 2026-10-31 截止",
+      "reasons": [
+        "岗位要求 Unity 编辑器工具、Shader 优化，与你的技术栈高度重合",
+        "全球 Top5 Roblox 开发者，实时渲染与工具链投入大"
+      ],
+      "tags": [
+        "出海游戏",
+        "TA",
+        "已截止"
+      ],
+      "jd": "配合项目组实现美术渲染效果，制作 Unity 编辑器工具，优化着色器与美术资源规范；2027 届统招本科及以上。",
+      "apply": "https://www.zhipin.com/job_detail/ae358f651ef2137f0nJ_3926FFdV.html",
+      "applyLabel": "BOSS 直聘",
+      "source": "BOSS 直聘"
+    },
+    {
+      "id": "geely-2027",
+      "company": "吉利控股集团",
+      "short": "吉利",
+      "title": "2027 届全球校招 · 设计类（UI / UX / CMF）",
+      "track": "hmi",
+      "city": [
+        "杭州",
+        "宁波",
+        "上海",
+        "苏州"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2027 届本硕博",
+      "fit": "expired",
+      "match": 79,
+      "deadline": "2026-10-31",
+      "deadlineText": "已于 2026-10-31 截止",
+      "reasons": [
+        "设计类含 UI/UX，5000+ offer 体量，命中概率高",
+        "智能座舱列入 G-TOP 计划重点方向"
+      ],
+      "tags": [
+        "整车厂",
+        "5000+ offer",
+        "已截止"
+      ],
+      "jd": "九大岗位类别含设计类（工业设计、UI/UX、CMF）；网申 2026-08-13 至 2026-10-31。",
+      "apply": "https://campus.geely.com",
+      "applyLabel": "吉利校招官网",
+      "source": "吉利控股校招"
+    },
+    {
+      "id": "papergames-2027",
+      "company": "叠纸游戏",
+      "short": "叠纸",
+      "title": "2027 秋招 · 美术设计类 / 动画 CG 类",
+      "track": "ta",
+      "city": [
+        "上海"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2026.9–2027.8 毕业",
+      "fit": "expired",
+      "match": 81,
+      "deadline": "2026-10-31",
+      "deadlineText": "已于 2026-10-31 截止",
+      "reasons": [
+        "动画 CG 与美术设计方向，与 3D 动画、虚拟角色经验契合",
+        "上海杨浦总部，作品集导向明确"
+      ],
+      "tags": [
+        "女性向头部",
+        "美术 / 动画",
+        "已截止"
+      ],
+      "jd": "岗位类型含技术研发、产品策划、美术设计、动画 CG、市场运营、游戏音频；工作地上海杨浦。",
+      "apply": "https://career.papegames.com/campus/position/list",
+      "applyLabel": "叠纸校招官网",
+      "source": "叠纸游戏校招"
+    },
+    {
+      "id": "kuro-2027",
+      "company": "库洛游戏",
+      "short": "库洛",
+      "title": "27 届秋招 · 美术类（鸣潮 / 战双）",
+      "track": "ta",
+      "city": [
+        "广州",
+        "上海"
+      ],
+      "batch": "2027 届校招",
+      "audience": "2026.9–2027.8 毕业",
+      "fit": "expired",
+      "match": 85,
+      "deadline": "2026-10-26",
+      "deadlineText": "已于 2026-10-26 截止",
+      "reasons": [
+        "二次元高品质美术管线，3D 动画与渲染要求高",
+        "广州 + 上海双城，内推渠道仍可尝试"
+      ],
+      "tags": [
+        "二次元",
+        "美术类",
+        "已截止"
+      ],
+      "jd": "从事游戏美术设计相关工作，涵盖美术类多个方向；2027 届美术设计类相关专业本科及以上。",
+      "apply": "https://kurogame.jobs.feishu.cn/campus/",
+      "applyLabel": "飞书投递",
+      "source": "库洛游戏校招"
+    }
+  ]
+};
+
+const TODAY = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const LS_KEY = 'jobradar.v1';
+
+let state = {
+  jobs: (DATA.jobs || []).map(j => Object.assign({}, j)),
+  tab: 'all',
+  q: '',
+  city: '',
+  sort: 'match',
+  saved: new Set(),
+  applied: new Set()
+};
+
+/* ---------- storage ---------- */
+function loadStore(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+    state.saved = new Set(raw.saved || []);
+    state.applied = new Set(raw.applied || []);
+  }catch(e){}
+}
+function saveStore(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({saved:[...state.saved], applied:[...state.applied]}));
+  }catch(e){}
+}
+
+/* ---------- date ---------- */
+function daysLeft(deadline){
+  if(!deadline) return null;
+  const p = deadline.split('-').map(Number);
+  if(p.length !== 3 || !p[0]) return null;
+  const end = new Date(p[0], p[1]-1, p[2]);
+  end.setHours(23,59,59,999);
+  return Math.ceil((end - Date.now()) / 86400000);
+}
+function liveStatus(job){
+  if(job.fit === 'expired') return 'expired';
+  const d = daysLeft(job.deadline);
+  if(d !== null && d < 0) return 'expired';
+  return 'active';
+}
+function deadlinePill(job){
+  const d = daysLeft(job.deadline);
+  if(liveStatus(job) === 'expired') return {cls:'dead', text: job.deadlineText || '已截止'};
+  if(d === null) return {cls:'long', text: job.deadlineText || '长期在招'};
+  if(d === 0) return {cls:'soon', text:'今天截止'};
+  if(d <= 7) return {cls:'soon', text:'剩 ' + d + ' 天截止'};
+  if(d <= 30) return {cls:'pill', text:'剩 ' + d + ' 天'};
+  return {cls:'long', text:'剩 ' + d + ' 天'};
+}
+function fitPill(job){
+  if(job.fit === 'eligible') return {cls:'fit-ok', text:'26 届可直接投'};
+  if(job.fit === 'check') return {cls:'fit-check', text:'届别需确认'};
+  return {cls:'fit-no', text:'已截止'};
+}
+
+/* ---------- render ---------- */
+const TRACK_LABEL = {hmi:'智能座舱 · HMI', ta:'游戏 · 技术美术', research:'用户研究'};
+
+function isSOE(job){
+  return /央企|国企|军工|国资委/.test((job.tags||[]).join(' ')) || /中国电子|中国一汽|中国电科|中电/.test(job.company);
+}
+
+function filtered(){
+  let arr = state.jobs.slice();
+  const tab = state.tab;
+
+  if(tab === 'expired'){
+    arr = arr.filter(j => liveStatus(j) === 'expired');
+  } else if(tab === 'mine'){
+    arr = arr.filter(j => state.saved.has(j.id) || state.applied.has(j.id));
+  } else {
+    arr = arr.filter(j => liveStatus(j) === 'active');
+    if(tab === 'hmi' || tab === 'ta' || tab === 'research') arr = arr.filter(j => j.track === tab);
+    if(tab === 'soe') arr = arr.filter(isSOE);
+  }
+
+  if(state.city) arr = arr.filter(j => (j.city||[]).some(c => c.indexOf(state.city) >= 0));
+  if(state.q){
+    const q = state.q.toLowerCase();
+    arr = arr.filter(j => (j.company + ' ' + j.title + ' ' + (j.tags||[]).join(' ') + ' ' + (j.city||[]).join(' ') + ' ' + j.jd).toLowerCase().includes(q));
+  }
+
+  if(state.sort === 'match') arr.sort((a,b) => (b.match||0) - (a.match||0));
+  else if(state.sort === 'deadline'){
+    arr.sort((a,b) => {
+      const da = daysLeft(a.deadline); const db = daysLeft(b.deadline);
+      if(da === null && db === null) return (b.match||0) - (a.match||0);
+      if(da === null) return 1;
+      if(db === null) return -1;
+      return da - db;
+    });
+  }
+
+  return arr;
+}
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function cardHTML(job){
+  const st = liveStatus(job);
+  const dl = deadlinePill(job);
+  const fp = fitPill(job);
+  const d = daysLeft(job.deadline);
+  const urgent = st === 'active' && d !== null && d <= 7;
+  const cities = (job.city || []).slice(0, 3).join(' · ') + ((job.city||[]).length > 3 ? ' +' + ((job.city||[]).length - 3) : '');
+  const scoreCls = job.match >= 88 ? '' : (job.match >= 78 ? 'mid' : 'low');
+  const saved = state.saved.has(job.id);
+  const applied = state.applied.has(job.id);
+
+  return `
+  <article class="card ${st === 'expired' ? 'dim' : ''} ${urgent ? 'urgent' : ''}" data-id="${esc(job.id)}">
+    <div class="chead">
+      <div class="logo">${esc(job.short || job.company.slice(0,2))}</div>
+      <div class="titles">
+        <h3>${esc(job.title)}</h3>
+        <div class="co"><b>${esc(job.company)}</b> · ${esc(job.batch)}</div>
+      </div>
+      <div class="score">
+        <div class="num ${scoreCls}">${job.match || '–'}</div>
+        <small>MATCH</small>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span class="pill ${fp.cls}">${fp.text}</span>
+      <span class="pill ${dl.cls}">${esc(dl.text)}</span>
+      <span class="pill">${esc(cities)}</span>
+      <span class="pill">${esc(TRACK_LABEL[job.track] || job.track)}</span>
+      <span class="pill">${esc(job.audience)}</span>
+    </div>
+
+    <p class="jd">${esc(job.jd)}</p>
+
+    <ul class="reasons">
+      ${(job.reasons||[]).map(r => `<li>${esc(r)}</li>`).join('')}
+    </ul>
+
+    <div class="tags">
+      ${(job.tags||[]).map(t => `<span class="tag">#${esc(t)}</span>`).join('')}
+    </div>
+
+    <div class="cfoot">
+      <span class="src">来源：${esc(job.source)}</span>
+      <div class="acts">
+        <button class="icon-btn" data-act="save" data-on="${saved ? 1 : 0}" title="收藏" aria-label="收藏">${saved ? '★' : '☆'}</button>
+        <button class="icon-btn ok" data-act="apply" data-on="${applied ? 1 : 0}" title="标记已投递" aria-label="标记已投递">✓</button>
+        <a class="apply ${st === 'expired' ? 'off' : ''}" href="${esc(job.apply)}" target="_blank" rel="noopener noreferrer" data-act="link">投递 ↗</a>
+      </div>
+    </div>
+  </article>`;
+}
+
+function render(){
+  const arr = filtered();
+  const list = document.getElementById('list');
+
+  if(!arr.length){
+    list.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <b>${state.tab === 'expired' ? '暂无已截止岗位' : '这个筛选下没有结果'}</b>
+      ${state.tab === 'mine' ? '点开任意岗位的 ☆ 收藏，或用 ✓ 标记已投递，这里就会留下记录。' : '换个筛选条件，或点右上角「更新岗位」重新抓取一轮。'}
+    </div>`;
+  } else {
+    list.innerHTML = arr.map(cardHTML).join('');
+  }
+
+  document.getElementById('listCount').textContent = `共 ${arr.length} 条 · 点击「投递」直达官方申请页`;
+  const titles = {all:'在招推荐', hmi:'智能座舱 · HMI', ta:'游戏 · 技术美术', research:'用户研究', soe:'央国企', mine:'我的收藏与投递', expired:'已截止岗位'};
+  document.getElementById('listTitle').textContent = titles[state.tab] || '在招推荐';
+
+  updateStats();
+}
+
+function counts(){
+  const active = state.jobs.filter(j => liveStatus(j) === 'active');
+  return {
+    all: active.length,
+    hmi: active.filter(j => j.track === 'hmi').length,
+    ta: active.filter(j => j.track === 'ta').length,
+    research: active.filter(j => j.track === 'research').length,
+    soe: active.filter(isSOE).length,
+    mine: state.jobs.filter(j => (state.saved.has(j.id) || state.applied.has(j.id))).length,
+    expired: state.jobs.filter(j => liveStatus(j) === 'expired').length
+  };
+}
+
+function updateStats(){
+  const c = counts();
+  const active = state.jobs.filter(j => liveStatus(j) === 'active');
+  const urgent = active.filter(j => { const d = daysLeft(j.deadline); return d !== null && d >= 0 && d <= 7; }).length;
+  const eligible = active.filter(j => j.fit === 'eligible').length;
+
+  document.getElementById('statActive').textContent = c.all;
+  document.getElementById('statUrgent').textContent = urgent;
+  document.getElementById('statEligible').textContent = eligible;
+  document.getElementById('statExpired').textContent = c.expired;
+
+  ['all','hmi','ta','research','soe','mine','expired'].forEach(k => {
+    const el = document.getElementById('n-' + k);
+    if(el) el.textContent = c[k];
+  });
+
+  const ver = DATA.version || 'v1';
+  const at = DATA.generatedAt ? DATA.generatedAt.replace('T',' ').slice(0,16) : '';
+  const timeEl = document.getElementById('statTime');
+  const ageH = DATA.generatedAt ? (Date.now() - new Date(DATA.generatedAt).getTime()) / 3600000 : 0;
+  timeEl.textContent = (at || ver) + (ageH > 24 ? ' · 建议更新' : '');
+  timeEl.style.color = ageH > 24 ? 'var(--accent)' : '';
+  document.getElementById('footVer').textContent = ver;
+  document.getElementById('footAt').textContent = at;
+}
+
+/* ---------- interaction ---------- */
+function initTabs(){
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected','false'));
+      btn.setAttribute('aria-selected','true');
+      state.tab = btn.dataset.tab;
+      render();
+      window.scrollTo({top: document.querySelector('.controls').offsetTop - 4, behavior:'smooth'});
+    });
+  });
+}
+
+function initCities(){
+  const set = new Set();
+  state.jobs.forEach(j => (j.city||[]).forEach(c => set.add(c)));
+  const sel = document.getElementById('city');
+  [...set].sort().forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    sel.appendChild(o);
+  });
+  sel.addEventListener('change', e => { state.city = e.target.value; render(); });
+}
+
+function initFilters(){
+  document.getElementById('search').addEventListener('input', e => { state.q = e.target.value.trim(); render(); });
+  document.getElementById('sort').addEventListener('change', e => { state.sort = e.target.value; render(); });
+}
+
+function bindActions(){
+  document.getElementById('list').addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    const card = e.target.closest('.card');
+    if(!card) return;
+    const id = card.dataset.id;
+    const act = btn.dataset.act;
+
+    if(act === 'save'){
+      if(state.saved.has(id)) state.saved.delete(id); else state.saved.add(id);
+      saveStore(); render();
+      toast(state.saved.has(id) ? '已加入收藏' : '已取消收藏');
+    }
+    if(act === 'apply'){
+      if(state.applied.has(id)) state.applied.delete(id); else state.applied.add(id);
+      saveStore(); render();
+      toast(state.applied.has(id) ? '已标记为已投递 · 记得在官网完成提交' : '已取消投递标记');
+    }
+    if(act === 'link'){
+      const job = state.jobs.find(j => j.id === id);
+      if(job && liveStatus(job) === 'expired') e.preventDefault();
+    }
+  });
+}
+
+function initSources(){
+  document.getElementById('sources').innerHTML = (DATA.platforms||[]).map(p => `
+    <a class="srclink" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">
+      <span class="g">${esc(p.group)}</span>
+      <span class="nm">${esc(p.name)}</span>
+      <span class="nt">${esc(p.note)}</span>
+    </a>`).join('');
+
+  const SOE = [
+    { name:'中国第一汽车集团', note:'设计类 · HMI / UI / UE', url:'http://www.faw.com.cn' },
+    { name:'东风汽车集团', note:'智能座舱 · 造型设计', url:'https://www.dfmc.com.cn/' },
+    { name:'中国兵器装备集团', note:'长安汽车 · 智能交互', url:'https://www.csgc.com.cn/56.html' },
+    { name:'中国电子科技集团', note:'14 所 · 人机交互设计', url:'http://www.cetc.com.cn/' },
+    { name:'中国电子信息产业集团', note:'交互体验设计师', url:'https://www.cec.com.cn/' },
+    { name:'中国航空工业集团', note:'座舱显控 · 人因工程', url:'https://www.avic.com.cn/' },
+    { name:'中国船舶集团', note:'舰船显控界面', url:'http://www.csic.com.cn/index.html' },
+    { name:'中国机械工业集团', note:'工业设计 · 装备交互', url:'http://www.sinomach.com.cn/' }
+  ];
+  const soeEl = document.getElementById('soeLinks');
+  if(soeEl){
+    soeEl.innerHTML = SOE.map(x => `
+      <a class="srclink" href="${x.url}" target="_blank" rel="noopener noreferrer">
+        <span class="g">央企 / 国企</span>
+        <span class="nm">${x.name}</span>
+        <span class="nt">${x.note}</span>
+      </a>`).join('');
+  }
+
+  document.getElementById('copySources').addEventListener('click', async () => {
+    const text = (DATA.platforms||[]).map(p => `${p.name} — ${p.url}`).join('\n');
+    try{ await navigator.clipboard.writeText(text); toast('已复制 ' + (DATA.platforms||[]).length + ' 个平台链接'); }
+    catch(e){ toast('复制失败，可手动选择链接', true); }
+  });
+}
+
+async function doUpdate(){
+  const btn = document.getElementById('updateBtn');
+  const label = document.getElementById('updateLabel');
+  btn.classList.add('loading'); btn.disabled = true; label.textContent = '正在校验…';
+
+  let note = '';
+  try{
+    const res = await fetch('jobs.json?t=' + Date.now(), {cache:'no-store'});
+    if(res.ok){
+      const fresh = await res.json();
+      if(fresh && Array.isArray(fresh.jobs) && fresh.jobs.length){
+        const before = state.jobs.length;
+        DATA.version = fresh.version || DATA.version;
+        DATA.generatedAt = fresh.generatedAt || DATA.generatedAt;
+        DATA.platforms = fresh.platforms || DATA.platforms;
+        state.jobs = fresh.jobs.map(j => Object.assign({}, j));
+        initSources();
+        note = before === state.jobs.length
+          ? '已同步最新岗位数据 · 共 ' + state.jobs.length + ' 条'
+          : '已同步最新岗位数据（' + before + ' → ' + state.jobs.length + ' 条）';
+      }
+    }
+  }catch(e){
+    note = '';
+  }
+
+  await new Promise(r => setTimeout(r, 520));
+
+  const c = counts();
+  const urgent = state.jobs.filter(j => { const d = daysLeft(j.deadline); return liveStatus(j) === 'active' && d !== null && d >= 0 && d <= 7; }).length;
+
+  render();
+  btn.classList.remove('loading'); btn.disabled = false; label.textContent = '更新岗位';
+
+  const tail = `在招 ${c.all} 个 · 7 天内截止 ${urgent} 个 · 自动隐藏 ${c.expired} 个已截止`;
+  toast(note ? note + ' · ' + tail : '已按今日重新校验有效期 · ' + tail);
+}
+
+let toastTimer;
+function toast(msg, isErr){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, 3200);
+}
+
+/* ---------- boot ---------- */
+loadStore();
+initTabs();
+initCities();
+initFilters();
+initSources();
+bindActions();
+render();
+document.getElementById('updateBtn').addEventListener('click', doUpdate);
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>
